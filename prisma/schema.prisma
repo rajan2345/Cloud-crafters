@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+
+  //Relationships
+  services    Service[]
+  @@map("categories")
+}
+
+model Service {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  cloudProvider   String    // "AWS", "Azure", "GCP", etc.
+  despcription    String?
+  features        Json      //JSONB for flexible feature storage 
+  documentationUrl String? //URL to official documentation
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  //Foreign Key
+  CategoryId      Int
+
+  //Relationships
+  category        Category @relation(fields: [CategoryId], references: [id])
+  sourceMappings  Mapping[] @relation("SourceService")
+  targetMappings  Mapping[] @relation("TargetService")
+
+  @@map("services")
+  @@index([cloudProvider])
+  @@index([CategoryId])
+}
+
+model Mapping {
+  id          Int     @id @default(autoincrement())
+  mappingType String  //'direct', 'composite', 'partial', 'no-equivalent'
+  confidence  Int     // 0-100 confidence score
+  caveats     String?  //Important differences or limitations
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+
+  //Foreign Keys
+  sourceServiceId  Int
+  targetServiceId  Int
+
+  //Relationships
+  sourceService    Service @relation("SourceService", fields: [sourceServiceId], references: [id])
+  targetService    Service @relation("TargetService", fields: [targetServiceId], references: [id])
+
+  @@map("mappings")
+  @@unique([sourceServiceId, targetServiceId])
+  @@index([sourceServiceId])
+  @@index([targetServiceId])
+}

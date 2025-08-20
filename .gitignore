@@ -1,0 +1,48 @@
+# Ignore all .env files
+.env*
+
+# Ignore all log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Build output
+dist
+build
+out
+
+# Miscellaneous
+.DS_Store
+.cache
+.project
+.settings
+.tmh
+*.bak
+*.swp
+*~.nib
+
+/src/generated/prisma
