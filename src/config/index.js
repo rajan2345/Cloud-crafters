@@ -1,5 +1,5 @@
-const environment = require('./environment');
-const createPrismaClient = require('./database');
+const environment = require('./environment.js');
+const createPrismaClient = require('./database.js');
 
 module.exports = {
     ...environment, 

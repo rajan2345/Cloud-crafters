@@ -2,10 +2,10 @@
 require('dotenv').config();
 
 // Import the Express app, configuration, logger, and Prisma client creator
-const app = require('./app');
-const config = require('./config');
-const logger = require('./utils/logger');
-const createPrismaClient = require('./config/database');
+const app = require('./app.js');
+const config = require('./config/index.js');
+const logger = require('./utils/logger.js');
+const createPrismaClient = require('./config/database.js');
 
 // Main function to start the server
 const startServer = async () => {

@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const logger = require('../utils/logger');
+const logger = require('../utils/logger.js');
 
 // Create a singleton instance of PrismaClient
 // This ensures that we do not create multiple instances of PrismaClient

@@ -4,11 +4,12 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
+
 //Import configurations and middlewares
-const config = require('./config');
-const { errorMiddleware } = require('./middleware/error.middleware');
-const { loggingMiddleware } = require('./middleware/logging.middleware');
-const routes = require('./routes');
+const config = require('./config/index.js');
+const { errorMiddleware } = require('./middleware/error.middleware.js');
+const { loggingMiddleware } = require('./middleware/logging.middleware.js');
+const routes = require('./routes/index.js');
 const { contentSecurityPolicy } = require('helmet');
 
 // Initialize the Express application
@@ -44,17 +45,17 @@ app.use(loggingMiddleware);
 // Mount the API routes
 app.use('/api', routes);
 
-// Handle 404 errors for unmatched routes
-app.use('*', (req, res) => {
+// Apply the global error handling middleware
+app.use(errorMiddleware);
+
+// Handle 404 errors for unmatched routes (this should be last)
+app.use((req, res) => {
     res.status(404).json({
         success: false,
         message: `Route ${req.method} ${req.originalUrl} not found`,
         timestamp: new Date().toISOString(),
     });
 });
-
-// Apply the global error handling middleware
-app.use(errorMiddleware);
 
 // Export the app for use in server.js
 module.exports = app;

@@ -24,8 +24,8 @@ const validateEnvironment = () =>{
 const config = {
     nodeEnv: process.env.NODE_ENV || 'development', // App environment (development/production)
     port: parseInt(process.env.PORT) || 3000,       // Server port
-    apiVersion: process.env.API_VERSION || 'v1',    // API version
-    logLevel: process.env.LOG_LEVEL || 'info',      // Logging level
+    // apiVersion: process.env.API_VERSION || 'v1',    // API version
+    // logLevel: process.env.LOG_LEVEL || 'info',      // Logging level
     database: {
         url: process.env.DATABASE_URL,              // Database connection URL
     },

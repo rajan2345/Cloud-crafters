@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,56 +11,74 @@ datasource db {
 }
 
 model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
   description String?
-  slug        String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  slug        String    @unique
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
-
-  //Relationships
+  // Relationships
   services    Service[]
+
   @@map("categories")
 }
 
+enum CloudProvider {
+  AWS
+  Azure
+  GCP
+  Other
+}
+
 model Service {
-  id              Int      @id @default(autoincrement())
-  name            String   @unique
-  cloudProvider   String    // "AWS", "Azure", "GCP", etc.
-  despcription    String?
-  features        Json      //JSONB for flexible feature storage 
-  documentationUrl String? //URL to official documentation
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               Int            @id @default(autoincrement())
+  name             String
+  cloudProvider    CloudProvider  @map("cloud_provider")
+  description      String?
+  features         Json?          @db.JsonB 
+  documentationUrl String?        @map("documentation_url")
+  isActive         Boolean        @default(true) @map("is_active")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
 
-  //Foreign Key
-  CategoryId      Int
+  // Foreign Key
+  categoryId       Int            @map("category_id")
+  
+  // Relationships
+  category         Category       @relation(fields: [categoryId], references: [id])
+  sourceMappings   Mapping[]      @relation("SourceService")
+  targetMappings   Mapping[]      @relation("TargetService")
 
-  //Relationships
-  category        Category @relation(fields: [CategoryId], references: [id])
-  sourceMappings  Mapping[] @relation("SourceService")
-  targetMappings  Mapping[] @relation("TargetService")
-
-  @@map("services")
+  @@unique([name, cloudProvider])
   @@index([cloudProvider])
-  @@index([CategoryId])
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("services")
+}
+
+enum MappingType {
+  DIRECT
+  COMPOSITE
+  PARTIAL
+  NO_EQUIVALENCE
 }
 
 model Mapping {
-  id          Int     @id @default(autoincrement())
-  mappingType String  //'direct', 'composite', 'partial', 'no-equivalent'
-  confidence  Int     // 0-100 confidence score
-  caveats     String?  //Important differences or limitations
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          Int          @id @default(autoincrement())
+  mappingType MappingType  @map("mapping_type")
+  confidence  Int          @default(0)
+  caveats     String?
+  isActive    Boolean      @default(true) @map("is_active")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
 
+  // Foreign Keys
+  sourceServiceId  Int  @map("source_service_id")
+  targetServiceId  Int  @map("target_service_id")
 
-  //Foreign Keys
-  sourceServiceId  Int
-  targetServiceId  Int
-
-  //Relationships
+  // Relationships
   sourceService    Service @relation("SourceService", fields: [sourceServiceId], references: [id])
   targetService    Service @relation("TargetService", fields: [targetServiceId], references: [id])
 
@@ -71,4 +86,5 @@ model Mapping {
   @@unique([sourceServiceId, targetServiceId])
   @@index([sourceServiceId])
   @@index([targetServiceId])
+  @@index([isActive])
 }
